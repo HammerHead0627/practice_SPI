@@ -2,5 +2,9 @@
     <string name="app_name">practice_SPI</string>
     <string name="question_label">問題文</string>
     <string name="count_label">Q%d</string>
-    <string name="answer_btn">選択肢</string>
+    <string name="answer_btn1">選択肢</string>
+    <string name="answer_btn2">選択肢</string>
+    <string name="answer_btn3">選択肢</string>
+    <string name="answer_btn4">選択肢</string>
+
 </resources>

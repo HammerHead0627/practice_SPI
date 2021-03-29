@@ -1,6 +1,11 @@
 package com.example.practice_spi;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Button;
 
@@ -21,6 +26,11 @@ public class MainActivity extends AppCompatActivity {
     private String rightAnswer;
     private int rightAnswerCount;
     private int quizCount = 1;
+    static final private int QUIZ_COUNT = 10 ;
+
+    public static int getQuizCount() {
+        return QUIZ_COUNT;
+    }
 
     //問題集
     //問題の配列を入れる配列quizArrayを定義する
@@ -79,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void showNextQuiz() {
-        // クイズカウントラベルを更新
+        // 問題カウントラベルを更新
         countLabel.setText(getString(R.string.count_label, quizCount));
 
         // ランダムな数字を取得
@@ -95,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
         // 正解をrightAnswerにセット
         rightAnswer = quiz.get(1);
 
-        // クイズ配列から問題文（都道府県名）を削除
+        // 問題配列から問題文（都道府県名）を削除
         quiz.remove(0);
 
         // 正解と選択肢３つをシャッフル
@@ -112,8 +122,41 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    //答え合わせをする
-    protected void checkAnswer(Bundle savedInstanceState) {
+    //正誤判定
+    public void checkAnswer(View view) {
 
+        // どの回答ボタンが押されたか
+        Button answerBtn = findViewById(view.getId());
+        String btnText = answerBtn.getText().toString();
+
+        String alertTitle;
+        if (btnText.equals(rightAnswer)) {
+            alertTitle = "正解!";
+            rightAnswerCount++;
+        } else {
+            alertTitle = "不正解...";
+        }
+
+        // ダイアログを作成
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(alertTitle);
+        builder.setMessage("答え : " + rightAnswer);
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                if (quizCount == QUIZ_COUNT) {
+                    // 結果画面へ移動
+                    Intent intent = new Intent(getApplicationContext(),ResultActivity.class);
+                    intent.putExtra("RIGHT_ANSWER_COUNT", rightAnswerCount);
+                    startActivity(intent);
+
+                } else {
+                    quizCount++;
+                    showNextQuiz();
+                }
+            }
+        });
+        builder.setCancelable(false);
+        builder.show();
     }
 }

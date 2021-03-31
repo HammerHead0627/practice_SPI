@@ -38,6 +38,8 @@ public class ResultActivity extends AppCompatActivity {
         editor.putInt("totalScore", totalScore);
         editor.apply();
     }
+
+    //1問目から再開
     public void returnTop(View view) {
         startActivity(new Intent(ResultActivity.this, MainActivity.class));
     }

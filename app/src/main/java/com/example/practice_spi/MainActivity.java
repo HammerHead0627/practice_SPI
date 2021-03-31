@@ -1,19 +1,22 @@
 package com.example.practice_spi;
 
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.view.View;
-import android.widget.TextView;
-import android.widget.Button;
-
 import android.os.Bundle;
+import android.os.Handler;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -28,13 +31,29 @@ public class MainActivity extends AppCompatActivity {
     private int quizCount = 1;
     static final private int QUIZ_COUNT = 10 ;
 
+    //問題番号ゲッター
     public static int getQuizCount() {
         return QUIZ_COUNT;
     }
 
-    //問題集
     //問題の配列を入れる配列quizArrayを定義する
     ArrayList<ArrayList<String>> quizArray = new ArrayList<>();
+
+    private Handler handler = new Handler();
+
+    //一定時間経過に画面表示を行う
+    TimerTask task = new TimerTask() {
+        @Override
+        public void run() {
+            handler.post(new Runnable(){
+                @Override
+                public void run(){
+                quizCount++;
+                showNextQuiz();
+                }
+            });
+        };
+    };
 
     //問題を定義
     String[][] quizData = {
@@ -50,6 +69,8 @@ public class MainActivity extends AppCompatActivity {
             {"栃木県", "宇都宮市", "札幌市", "岡山市", "奈良市"},
             {"群馬県", "前橋市", "福岡市", "松江市", "福井市"},
     };
+
+
 
     //todo
     //DBから問題を取得する
@@ -85,9 +106,12 @@ public class MainActivity extends AppCompatActivity {
             quizArray.add(tmpArray);
         }
 
+        //次の問題へ
         showNextQuiz();
+
     }
 
+    //問題を表示する
     public void showNextQuiz() {
         // 問題カウントラベルを更新
         countLabel.setText(getString(R.string.count_label, quizCount));
@@ -119,8 +143,8 @@ public class MainActivity extends AppCompatActivity {
 
         //出題した問題をquizArrayから削除
         quizArray.remove(randomNum);
-    }
 
+    }
 
     //正誤判定
     public void checkAnswer(View view) {
@@ -128,6 +152,7 @@ public class MainActivity extends AppCompatActivity {
         // どの回答ボタンが押されたか
         Button answerBtn = findViewById(view.getId());
         String btnText = answerBtn.getText().toString();
+
 
         String alertTitle;
         if (btnText.equals(rightAnswer)) {
@@ -145,7 +170,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 if (quizCount == QUIZ_COUNT) {
-                    // 結果画面へ移動
+                    // 全問終了後結果画面へ移動する
                     Intent intent = new Intent(getApplicationContext(),ResultActivity.class);
                     intent.putExtra("RIGHT_ANSWER_COUNT", rightAnswerCount);
                     startActivity(intent);
@@ -159,4 +184,12 @@ public class MainActivity extends AppCompatActivity {
         builder.setCancelable(false);
         builder.show();
     }
+
+    //制限時間を超えた際に行う処理
+    public void timeOutProcess(){
+        Timer timer = new Timer();
+        timer.schedule(task, 30000);
+    }
+
+
 }
